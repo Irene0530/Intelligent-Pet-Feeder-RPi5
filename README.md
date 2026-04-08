@@ -67,6 +67,7 @@ python3 mainweb.py
     * [cite_start]**Optimizer**: AdamW[cite: 159].
     * **Hardware Acceleration**: Trained with Automatic Mixed Precision (AMP) enabled.
 * [cite_start]**Augmentation Strategy**: The pipeline employed Mosaic augmentation (disabled for the final 10 epochs), Copy-Paste (0.3), HSV adjustments, and spatial transformations (rotation, shear, and scaling) to improve generalization[cite: 156, 161].
+* Model Generation: The training logic is preserved in the /training directory. This includes the train.py script used to execute the 150-epoch session and the mydata.yaml which defines the dataset structure. This allows for full transparency of the hyperparameters and augmentation techniques used to achieve the final precision.
 
 ### Weight Calibration
 [cite_start]To address the non-linearity of low-cost load cells, a **Hybrid Calibration Algorithm** is implemented in the `WeightMapper` class[cite: 166, 278]:
