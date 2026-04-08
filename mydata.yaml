@@ -1,0 +1,8 @@
+# 数据集路径配置（YAML要求键值对必须有空格分隔）
+train: C:/Users/Tai Kuan Cheng/Downloads/yolo_dataset/yolo_dataset/images/train
+val: C:/Users/Tai Kuan Cheng/Downloads/yolo_dataset/yolo_dataset/images/val
+test: C:/Users/Tai Kuan Cheng/Downloads/yolo_dataset/yolo_dataset/images/test
+
+# 类别配置
+nc: 2
+names: ['cat', 'dog']
