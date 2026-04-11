@@ -53,7 +53,7 @@ The system operates as a multi-threaded embedded application:
 ├── main5.py              # Local GUI version
 ├── mainweb.py            # Web-based version
 ├── best.pt               # Trained YOLO model
-├── hx711.py               # HX711 sensor interface (adapted library)
+├── hx711.py              # HX711 sensor interface (adapted library)
 ├── training/             # Model training scripts and configs
 │   ├── train.py
 │   └── mydata.yaml
@@ -67,13 +67,19 @@ The system operates as a multi-threaded embedded application:
 Install dependencies:
 
 ```bash
-pip install opencv-python numpy Pillow ultralytics adafruit-circuitpython-dht
+pip install opencv-python numpy Pillow ultralytics adafruit-circuitpython-dht picamera2
 ```
+
+Additional notes:
+
+* RPi.GPIO and `board` libraries are typically pre-installed on Raspberry Pi OS
+* The HX711 module is included locally in the project (`hx711.py`)
+* The system is designed to run on Raspberry Pi OS with GPIO-connected hardware
 
 Ensure:
 
-* `best.pt` (trained YOLO model) is in the same directory
-* HX711 library is available in the `/hx711` folder
+* `best.pt` (trained YOLO model) is located in the project directory
+* The HX711 module file (`hx711.py`) is present in the same directory
 
 ---
 
