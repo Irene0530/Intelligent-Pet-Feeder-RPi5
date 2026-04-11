@@ -46,7 +46,24 @@ The system operates as a multi-threaded embedded application:
 
 ---
 
-## 5. Installation
+## 5. Project Structure
+
+```
+.
+├── main5.py              # Local GUI version
+├── mainweb.py            # Web-based version
+├── best.pt               # Trained YOLO model
+├── hx711/                # HX711 sensor interface (adapted library)
+│   └── hx711.py
+├── training/             # Model training scripts and configs
+│   ├── train.py
+│   └── mydata.yaml
+└── README.md
+```
+
+---
+
+## 6. Installation
 
 Install dependencies:
 
@@ -57,11 +74,11 @@ pip install opencv-python numpy Pillow ultralytics adafruit-circuitpython-dht
 Ensure:
 
 * `best.pt` (trained YOLO model) is in the same directory
-* `hx711py` is available locally or installed
+* HX711 library is available in the `/hx711` folder
 
 ---
 
-## 6. How to Run
+## 7. How to Run
 
 ### Local GUI Mode
 
@@ -75,7 +92,7 @@ python3 main5.py
 python3 mainweb.py
 ```
 
-Then open browser:
+Then open a browser and access:
 
 ```
 http://<raspberry_pi_ip>:8000
@@ -83,11 +100,11 @@ http://<raspberry_pi_ip>:8000
 
 ---
 
-## 7. Feeding Logic
+## 8. Feeding Logic
 
 * Feeding is **user-triggered**
 * User sets target weight (e.g., 100g)
-* Servo opens and food is dispensed
+* Servo dispenses food incrementally
 * HX711 monitors weight in real time
 * Feeding stops when target is reached or timeout occurs
 
@@ -95,7 +112,34 @@ A global lock (`feed_job_lock`) ensures that only one feeding task runs at a tim
 
 ---
 
-## 8. Known Limitations
+## 9. Model Training
+
+The YOLOv11 model was trained using a custom dataset of 2,984 annotated images of cats and dogs.
+
+**Training configuration:**
+
+* Epochs: 150
+* Image size: 640 × 640
+* Optimizer: AdamW
+* Data split: 80% training / 10% validation / 10% testing
+
+**Data augmentation techniques:**
+
+* Mosaic augmentation (disabled in final epochs)
+* Brightness and contrast adjustment
+* Rotation and scaling
+* Copy-paste augmentation
+
+The training pipeline is provided in the `/training` directory, including:
+
+* `train.py`: training script
+* `mydata.yaml`: dataset configuration
+
+This ensures reproducibility and transparency of the model development process.
+
+---
+
+## 10. Known Limitations
 
 * Detection accuracy depends on lighting conditions
 * No HTTPS (LAN-only usage recommended)
@@ -104,23 +148,31 @@ A global lock (`feed_job_lock`) ensures that only one feeding task runs at a tim
 
 ---
 
-## 9. Future Improvements
+## 11. Future Improvements
 
 * Cloud data storage and analytics
 * Secure remote access (HTTPS / authentication)
 * Model optimisation for faster inference
-* Automatic feeding strategies based on behaviour
+* Adaptive feeding strategies based on behaviour
 
 ---
 
-## 10. Attribution
+## 12. Attribution
 
 * YOLO framework: https://github.com/ultralytics/ultralytics
-* Dataset: Kaggle Dog vs Cat Detection
+* Dataset: https://www.kaggle.com/datasets/andrewmvd/dog-and-cat-detection
+
+### External Libraries
+
+The HX711 load cell interface is implemented using a modified version of an open-source Python library:
+
+https://github.com/tatobari/hx711py
+
+Only the necessary components were integrated and adapted for this project.
 
 ---
 
-## 11. Author
+## 13. Author
 
 Final Year Project – University of Manchester
 Student: Kuan Cheng Tai
