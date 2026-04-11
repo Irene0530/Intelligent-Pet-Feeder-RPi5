@@ -1,87 +1,126 @@
-# Intelligent-Pet-Feeder-RPi5
+# Intelligent Pet Feeder (Raspberry Pi 5)
 
-## 1. Introduction
-[cite_start]This software suite serves as the core processing unit for an intelligent vision-based pet feeding system designed for multi-pet households[cite: 44, 46]. Utilizing the **Raspberry Pi 5** as an edge computing core, the system provides two distinct operational modes:
+## 1. Overview
 
-* [cite_start]**Local Mode (`main5.py`)**: A desktop graphical user interface (GUI) built with Tkinter for real-time monitoring and manual control directly on the device[cite: 233, 234].
-* [cite_start]**Web Mode (`mainweb.py`)**: A concurrent IoT dashboard powered by a multi-threaded HTTP server, allowing remote monitoring and feeding via any browser on the Local Area Network (LAN) [cite: 243-245].
+This project implements an intelligent vision-based pet feeding system designed for multi-pet households. The system integrates real-time computer vision, weight sensing, and closed-loop control on a Raspberry Pi 5 platform.
 
-[cite_start]The system integrates YOLOv11 object detection, a custom hybrid weight calibration algorithm, and closed-loop servo control to ensure precise, species-specific feeding[cite: 46, 51].
+It supports two operating modes:
 
----
+* **Local Mode (`main5.py`)** – Tkinter-based GUI for real-time monitoring and manual feeding
+* **Web Mode (`mainweb.py`)** – Remote dashboard accessible via browser (LAN only)
 
-## 2. Contextual Overview
-[cite_start]The software operates as a central hub, managing asynchronous multi-threaded loops to maintain high responsiveness[cite: 50, 136]:
-
-* [cite_start]**Vision**: Continuous capture of 480x360 frames with real-time YOLOv11 inference at approximately 20 fps[cite: 326, 331, 436].
-* [cite_start]**Sensing**: Dual-channel weight acquisition from HX711 ADCs and ambient environmental data (temperature/humidity) from a DHT11 sensor[cite: 46, 303, 304].
-* [cite_start]**Control**: Execution of PWM-driven feeding tasks using a setpoint-based closed-loop strategy with a 30-second safety timeout[cite: 49, 344, 355].
-* [cite_start]**Networking**: A background daemon thread serving a responsive HTML/CSS dashboard for remote interaction[cite: 137, 138, 222].
+The system focuses on **precision feeding, real-time monitoring, and safe control**, rather than full automation.
 
 ---
 
-## 3. Installation Instructions
+## 2. Key Features
 
-### Prerequisites
-* [cite_start]**Hardware**: Raspberry Pi 5, IMX500 Camera, 2x SG90 Servos, 2x HX711 Load Cells (with strain gauges), and a DHT11 Sensor [cite: 122-131].
-* **OS**: Raspberry Pi OS (64-bit recommended).
+* Real-time pet detection (cat/dog) using YOLOv11
+* Dual-bowl independent feeding system
+* Closed-loop weight-based feeding control
+* Hybrid weight calibration algorithm (interval + regression)
+* Multi-threaded architecture for real-time responsiveness
+* Local GUI + Web dashboard (concurrent operation)
+* Safety mechanisms (timeout + task locking)
 
-### Dependencies
-Ensure Python 3 is installed, then install the required libraries:
+---
+
+## 3. System Architecture
+
+The system operates as a multi-threaded embedded application:
+
+* **Vision Thread** – captures frames and performs YOLO inference (~20 FPS)
+* **Sensor Loop** – reads HX711 and DHT11 data every 2 seconds
+* **Control Logic** – executes feeding tasks using real-time weight feedback
+* **Web Server Thread** – handles HTTP requests for remote monitoring/control
+
+---
+
+## 4. Hardware Requirements
+
+* Raspberry Pi 5
+* Raspberry Pi Camera (IMX500 or compatible)
+* 2 × HX711 Load Cells
+* 2 × SG90 Servo Motors
+* DHT11 Temperature/Humidity Sensor
+
+---
+
+## 5. Installation
+
+Install dependencies:
 
 ```bash
 pip install opencv-python numpy Pillow ultralytics adafruit-circuitpython-dht
 ```
 
-*Note: `picamera2` and `RPi.GPIO` are typically pre-installed on Raspberry Pi OS. [cite_start]For HX711 functionality, ensure the `hx711py` library is present in the project directory [cite: 267-269].*
+Ensure:
+
+* `best.pt` (trained YOLO model) is in the same directory
+* `hx711py` is available locally or installed
 
 ---
 
-## 4. How to Run
-[cite_start]Ensure the trained model file `best.pt` is located in the same directory as the Python scripts[cite: 322, 325].
+## 6. How to Run
 
-### To start the Local GUI:
+### Local GUI Mode
+
 ```bash
 python3 main5.py
 ```
 
-### To start the Web-Enabled System:
+### Web Mode
+
 ```bash
 python3 mainweb.py
 ```
 
-[cite_start]Once `mainweb.py` is initialized, the console will display the local access URL (e.g., `http://192.168.x.x:8000`)[cite: 252]. [cite_start]Access this URL from any device on the same Wi-Fi network to use the remote dashboard[cite: 252].
+Then open browser:
+
+```
+http://<raspberry_pi_ip>:8000
+```
 
 ---
 
-## 5. Technical Details
+## 7. Feeding Logic
 
-### Vision Subsystem (YOLOv11)
-[cite_start]The vision module utilizes a lightweight **YOLOv11n (Nano)** architecture optimized for edge inference[cite: 162, 321, 439].
+* Feeding is **user-triggered**
+* User sets target weight (e.g., 100g)
+* Servo opens and food is dispensed
+* HX711 monitors weight in real time
+* Feeding stops when target is reached or timeout occurs
 
-* **Dataset Acquisition**: The model was trained using the "Dog and Cat Detection" dataset sourced from [Andrewmvd (Kaggle)](https://www.kaggle.com/datasets/andrewmvd/dog-and-cat-detection).
-* [cite_start]**Data Partitioning**: A total of 2,984 annotated images were partitioned into **Training (80%)**, **Validation (10%)**, and **Testing (10%)** sets[cite: 155, 157].
-* **Training Configuration**:
-    * **imgsz**: 640x640 pixels.
-    * **Epochs**: 150.
-    * [cite_start]**Optimizer**: AdamW[cite: 159].
-    * **Hardware Acceleration**: Trained with Automatic Mixed Precision (AMP) enabled.
-* [cite_start]**Augmentation Strategy**: The pipeline employed Mosaic augmentation (disabled for the final 10 epochs), Copy-Paste (0.3), HSV adjustments, and spatial transformations (rotation, shear, and scaling) to improve generalization[cite: 156, 161].
-* Model Generation: The training logic is preserved in the /training directory. This includes the train.py script used to execute the 150-epoch session and the mydata.yaml which defines the dataset structure. This allows for full transparency of the hyperparameters and augmentation techniques used to achieve the final precision.
-
-### Weight Calibration
-[cite_start]To address the non-linearity of low-cost load cells, a **Hybrid Calibration Algorithm** is implemented in the `WeightMapper` class[cite: 166, 278]:
-
-1.  [cite_start]**Interval Matching**: Uses a lookup table generated through combinatorial summation of base calibration points (65g, 100g, 200g, 265g) for high-precision local matching [cite: 178-183].
-2.  [cite_start]**Linear Regression Fallback**: Employs a least-squares linear regression model to estimate weights falling outside pre-calibrated intervals[cite: 185, 191, 196].
-3.  [cite_start]**Digital Filtering**: Includes a 5g noise threshold to suppress sensor drift and idle fluctuations[cite: 197, 284].
+A global lock (`feed_job_lock`) ensures that only one feeding task runs at a time to prevent hardware conflicts.
 
 ---
 
-## 6. Known Issues and Attribution
+## 8. Known Limitations
 
-* [cite_start]**Lighting Sensitivity**: Object detection accuracy may decrease in low-light or high-glare environments[cite: 427].
-* [cite_start]**Network Security**: The web server currently operates over unencrypted HTTP and is intended for use within a secure Local Area Network (LAN)[cite: 448].
-* **Attribution**: This project utilizes the [Ultralytics](https://github.com/ultralytics/ultralytics) framework. [cite_start]Modifications were made to the standard YOLOv11 implementation to support asynchronous frame processing and integration with the Tkinter GUI and ThreadingHTTPServer[cite: 764, 912].
+* Detection accuracy depends on lighting conditions
+* No HTTPS (LAN-only usage recommended)
+* Load cells may require recalibration over time
+* Feeding is not automatically triggered by detection
 
+---
 
+## 9. Future Improvements
+
+* Cloud data storage and analytics
+* Secure remote access (HTTPS / authentication)
+* Model optimisation for faster inference
+* Automatic feeding strategies based on behaviour
+
+---
+
+## 10. Attribution
+
+* YOLO framework: https://github.com/ultralytics/ultralytics
+* Dataset: Kaggle Dog vs Cat Detection
+
+---
+
+## 11. Author
+
+Final Year Project – University of Manchester
+Student: Kuan Cheng Tai
