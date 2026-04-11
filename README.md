@@ -53,8 +53,7 @@ The system operates as a multi-threaded embedded application:
 ├── main5.py              # Local GUI version
 ├── mainweb.py            # Web-based version
 ├── best.pt               # Trained YOLO model
-├── hx711/                # HX711 sensor interface (adapted library)
-│   └── hx711.py
+├── hx711.py               # HX711 sensor interface (adapted library)
 ├── training/             # Model training scripts and configs
 │   ├── train.py
 │   └── mydata.yaml
