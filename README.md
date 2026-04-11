@@ -64,15 +64,33 @@ The system operates as a multi-threaded embedded application:
 
 ## 6. Installation
 
-Install dependencies:
+Install Python dependencies:
 
 ```bash
 pip install opencv-python numpy Pillow ultralytics adafruit-circuitpython-dht picamera2
 ```
 
-Additional notes:
+### System Setup (Raspberry Pi)
 
-* RPi.GPIO and `board` libraries are typically pre-installed on Raspberry Pi OS
+Ensure the camera interface is enabled:
+
+```bash
+sudo raspi-config
+```
+
+Navigate to:
+**Interface Options → Camera → Enable**
+
+If required, install camera support tools:
+
+```bash
+sudo apt update
+sudo apt install libcamera-apps
+```
+
+### Additional Notes
+
+* `RPi.GPIO` and `board` libraries are typically pre-installed on Raspberry Pi OS
 * The HX711 module is included locally in the project (`hx711.py`)
 * The system is designed to run on Raspberry Pi OS with GPIO-connected hardware
 
