@@ -61,7 +61,7 @@ User Input (GUI / Web) -> request_feed() -> ServoFeeder -> HX711 feedback
 ├── best.pt               # Trained YOLOv11-based model
 ├── hx711.py              # HX711 sensor interface (adapted library)
 ├── training/             # Model training scripts and configs
-│   ├── train.py
+│   ├── yolov11_train.py
 │   └── mydata.yaml
 └── README.md
 ```
