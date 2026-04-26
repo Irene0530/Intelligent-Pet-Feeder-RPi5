@@ -342,6 +342,3 @@ Only the necessary components were integrated and adapted for this project.
 
 Third Year Individual Project – University of Manchester
 **Student:** Kuan Cheng Tai
-
-```
-```
